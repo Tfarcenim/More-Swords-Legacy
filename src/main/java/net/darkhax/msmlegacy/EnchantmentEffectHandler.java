@@ -182,7 +182,7 @@ public class EnchantmentEffectHandler {
 
                 if (!entities.isEmpty()) {
 
-                    final Entity randomEntity = entities.get(MathsUtils.nextIntInclusive(0, entities.size()));
+                    final Entity randomEntity = entities.get(user.world.rand.nextInt(entities.size()));
 
                     if (randomEntity instanceof EntityLivingBase) {
 
