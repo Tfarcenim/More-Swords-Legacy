@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.apache.commons.lang3.EnumUtils;
 
+import net.darkhax.msmlegacy.enchantment.EnchantmentKeenEdge;
 import net.darkhax.msmlegacy.enchantment.EnchantmentSwordLegacy;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantment.Rarity;
@@ -48,6 +49,18 @@ public class ConfigurationHandler {
         min = this.config.getInt("minLevel_" + id, category, min, 1, 128, "The min level for the " + id + " enchantment.");
         max = this.config.getInt("maxLevel_" + id, category, max, min, 128, "The max level for the " + id + " enchantment.");
         final Enchantment enchant = new EnchantmentSwordLegacy(rarity, sword, type, min, max, survivalAllowed);
+        enchant.setName("msmlegacy." + id);
+        return enchant;
+    }
+    
+    public Enchantment getKeenEdge (String id, Item sword, Rarity rarity, int min, int max) {
+
+        final String category = sword.getRegistryName().getPath();
+        final EnumEnchantmentType type = this.allowEnchOnAllSwords && true ? EnumEnchantmentType.WEAPON : EnumHelper.addEnchantmentType("MSM_LEGACY_" + id.toUpperCase(), item -> item == sword);
+        rarity = this.getRarity(id, rarity, category, "The rarity for the " + id + " enchantment. Accepts COMMON, UNCOMMON, RARE, VERY_RARE");
+        min = this.config.getInt("minLevel_" + id, category, min, 1, 128, "The min level for the " + id + " enchantment.");
+        max = this.config.getInt("maxLevel_" + id, category, max, min, 128, "The max level for the " + id + " enchantment.");
+        final Enchantment enchant = new EnchantmentKeenEdge(rarity, sword, type, min, max, true);
         enchant.setName("msmlegacy." + id);
         return enchant;
     }

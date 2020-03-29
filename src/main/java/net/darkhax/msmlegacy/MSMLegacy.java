@@ -87,7 +87,7 @@ public class MSMLegacy {
         this.registry.addShapedRecipe("gladiolus", new ItemStack(this.gladiolus), " lv", "sfl", "ts ", 'l', OreDictUtils.TREE_LEAVES, 'v', OreDictUtils.VINE, 's', OreDictUtils.TREE_SAPLING, 'f', new ItemStack(Blocks.RED_FLOWER, 1, 1), 't', OreDictUtils.STICK_WOOD);
 
         this.draconicBlade = this.registry.registerItem(new ItemSword(this.config.getMaterial("draconic_blade", 3, 1089, 8, 7, 16)), "draconic_blade");
-        this.keenEdge = this.registry.registerEnchantment(this.config.getSwordEnchantment("keen_edge", this.draconicBlade, Rarity.COMMON, 1, 3), "keen_edge");
+        this.keenEdge = this.registry.registerEnchantment(this.config.getKeenEdge("keen_edge", this.draconicBlade, Rarity.COMMON, 1, 3), "keen_edge");
         this.scorn = this.registry.registerEnchantment(this.config.getSwordEnchantment("scorn", this.draconicBlade, Rarity.RARE, 1, 1), "scorn");
         this.registry.addShapedRecipe("draconic_blade", new ItemStack(this.draconicBlade), " ir", "ldi", "sl ", 'i', OreDictUtils.INGOT_IRON, 'r', OreDictUtils.DUST_REDSTONE, 'l', OreDictUtils.GEM_LAPIS, 'd', OreDictUtils.GEM_DIAMOND, 's', OreDictUtils.STICK_WOOD);
 

@@ -54,7 +54,6 @@ public class EnchantmentEffectHandler {
                 checkAndApplyEffect(msm.feast, target, attacker, heldItem, EnchantmentEffectHandler::handleFeastEffect, event);
                 checkAndApplyEffect(msm.venomousAspect, target, attacker, heldItem, EnchantmentEffectHandler::handleVenomousAspect, event);
                 checkAndApplyEffect(msm.absorb, target, attacker, heldItem, EnchantmentEffectHandler::handleAbsorbEffect, event);
-                checkAndApplyEffect(msm.keenEdge, target, attacker, heldItem, EnchantmentEffectHandler::handleKeenEdgeEffect, event);
                 checkAndApplyEffect(msm.scorn, target, attacker, heldItem, EnchantmentEffectHandler::handleScornEffect, event);
                 checkAndApplyEffect(msm.greed, target, attacker, heldItem, EnchantmentEffectHandler::handleGreedEffect, event);
                 checkAndApplyEffect(msm.wisdom, target, attacker, heldItem, EnchantmentEffectHandler::handleWisdomEffect, event);
@@ -235,11 +234,6 @@ public class EnchantmentEffectHandler {
 
             event.setAmount(event.getAmount() * (level + 1));
         }
-    }
-
-    private static void handleKeenEdgeEffect (EntityLivingBase attacker, EntityLivingBase target, ItemStack item, int level, LivingHurtEvent event) {
-
-        event.setAmount(event.getAmount() + 1.5f * level);
     }
 
     private static void handleAbsorbEffect (EntityLivingBase attacker, EntityLivingBase target, ItemStack item, int level, LivingHurtEvent event) {
