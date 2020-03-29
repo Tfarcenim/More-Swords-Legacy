@@ -79,7 +79,7 @@ public class EnchantmentEffectHandler {
     @SubscribeEvent
     public static void onItemUsedEvent (PlayerInteractEvent.RightClickItem event) {
 
-        if (!event.getItemStack().isEmpty()) {
+        if (!event.getItemStack().isEmpty() && event.getHand() == EnumHand.MAIN_HAND) {
 
             checkAndApplyEffect(msm.vitality, event.getEntityPlayer(), event.getItemStack(), EnchantmentEffectHandler::handleVitalityEffect, event);
             checkAndApplyEffect(msm.enderPulse, event.getEntityPlayer(), event.getItemStack(), EnchantmentEffectHandler::handleEnderPulseEffect, event);
