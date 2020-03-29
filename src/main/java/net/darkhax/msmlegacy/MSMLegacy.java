@@ -24,7 +24,7 @@ public class MSMLegacy {
 
     private final CreativeTabs creativeTab = new CreativeTabMSMLegacy();
     public final RegistryHelper registry = new RegistryHelper("msmlegacy").setTab(this.creativeTab).enableAutoRegistration();
-    public final ConfigurationHandler config = new ConfigurationHandler(new File("config/msmlegacy.cfg"));
+    public final static ConfigurationHandler config = new ConfigurationHandler(new File("config/msmlegacy.cfg"));
     private final String[] relicNames = { "aqueous", "candy", "infinity", "keyblade", "master", "molten", "pie" };
     public final List<Item> relics = new ArrayList<>();
 

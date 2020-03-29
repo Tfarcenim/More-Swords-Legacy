@@ -18,11 +18,16 @@ public class ConfigurationHandler {
 
     private final Configuration config;
     private boolean allowEnchOnAllSwords = false;
+    private float spawnChance = 0.01f;
+
+	private boolean allowRelics = true;
 
     public ConfigurationHandler (File configFile) {
 
         this.config = new Configuration(configFile);
         this.allowEnchOnAllSwords = this.config.getBoolean("allowEnchOnAllSwords", Configuration.CATEGORY_GENERAL, false, "When enabled, all new enchantments will be available for all swords, including vanilla and modded swords.");
+        this.spawnChance = this.config.getFloat("spawnChance", "general", 0.01f, 0f, 1f, "The chance of a mob spawning with one of the items from this mod.");
+        this.allowRelics = this.config.getBoolean("allowRelicSpawning", "general", true, "Whether or not mobs can spawn with the relic swords.");
     }
 
     public ToolMaterial getMaterial (String name, int harvestLevel, int maxUses, int efficiency, int damage, int enchantability) {
@@ -78,6 +83,14 @@ public class ConfigurationHandler {
         return rarity;
     }
 
+    public float getSpawnChance() {
+		return spawnChance;
+	}
+
+	public boolean isAllowRelics() {
+		return allowRelics;
+	}
+	
     public void syncConfigData () {
 
         if (this.config.hasChanged()) {

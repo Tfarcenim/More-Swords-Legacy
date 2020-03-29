@@ -4,6 +4,7 @@ import java.util.List;
 
 import net.darkhax.bookshelf.util.EntityUtils;
 import net.darkhax.bookshelf.util.MathsUtils;
+import net.darkhax.msmlegacy.item.ItemSwordRelic;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -101,11 +102,11 @@ public class EnchantmentEffectHandler {
     @SubscribeEvent
     public static void onSpecialSpawn (SpecialSpawn event) {
 
-        if ((event.getEntity() instanceof EntitySkeleton || event.getEntity() instanceof EntityZombie) && MathsUtils.tryPercentage(0.01)) {
+        if ((event.getEntity() instanceof EntitySkeleton || event.getEntity() instanceof EntityZombie) && MathsUtils.tryPercentage(MSMLegacy.config.getSpawnChance())) {
 
             final Item item = msm.registry.getItems().get(event.getWorld().rand.nextInt(msm.registry.getItems().size()));
 
-            if (item != msm.adminiumArk) {
+            if (item != msm.adminiumArk && (MSMLegacy.config.isAllowRelics() || !(item instanceof ItemSwordRelic))) {
 
                 event.getEntityLiving().setHeldItem(EnumHand.MAIN_HAND, new ItemStack(item));
             }
