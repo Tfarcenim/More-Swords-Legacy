@@ -2,38 +2,31 @@ package net.darkhax.msmlegacy;
 
 import java.util.List;
 
-import net.darkhax.bookshelf.util.EntityUtils;
-import net.darkhax.bookshelf.util.MathsUtils;
 import net.darkhax.msmlegacy.init.ModEnchantments;
 import net.darkhax.msmlegacy.init.ModItems;
 import net.darkhax.msmlegacy.item.ItemSwordRelic;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityXPOrb;
-import net.minecraft.entity.monster.EntitySkeleton;
-import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
+
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.RayTraceResult.Type;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent.SpecialSpawn;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.Instance;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
+
 
 @EventBusSubscriber(modid = "msmlegacy")
 public class EnchantmentEffectHandler {
@@ -44,10 +37,10 @@ public class EnchantmentEffectHandler {
     @SubscribeEvent
     public static void onDamageMob (LivingHurtEvent event) {
 
-        if (event.getSource().getTrueSource() instanceof EntityLivingBase) {
+        if (event.getSource().getTrueSource() instanceof LivingEntity) {
 
-            final EntityLivingBase target = event.getEntityLiving();
-            final EntityLivingBase attacker = (EntityLivingBase) event.getSource().getTrueSource();
+            final LivingEntity target = event.getEntityLiving();
+            final LivingEntity attacker = (LivingEntity) event.getSource().getTrueSource();
             final ItemStack heldItem = attacker.getHeldItemMainhand();
 
             if (!heldItem.isEmpty()) {
@@ -69,7 +62,7 @@ public class EnchantmentEffectHandler {
             }
         }
 
-        final EntityLivingBase user = event.getEntityLiving();
+        final LivingEntity user = event.getEntityLiving();
         final ItemStack userItem = user.getHeldItemMainhand();
 
         if (!userItem.isEmpty()) {
@@ -81,18 +74,18 @@ public class EnchantmentEffectHandler {
     @SubscribeEvent
     public static void onItemUsedEvent (PlayerInteractEvent.RightClickItem event) {
 
-        if (!event.getItemStack().isEmpty() && event.getHand() == EnumHand.MAIN_HAND) {
+        if (!event.getItemStack().isEmpty() && event.getHand() == Hand.MAIN_HAND) {
 
-            checkAndApplyEffect(ModEnchantments.vitality, event.getEntityPlayer(), event.getItemStack(), EnchantmentEffectHandler::handleVitalityEffect, event);
-            checkAndApplyEffect(ModEnchantments.enderPulse, event.getEntityPlayer(), event.getItemStack(), EnchantmentEffectHandler::handleEnderPulseEffect, event);
-            checkAndApplyEffect(ModEnchantments.stealth, event.getEntityPlayer(), event.getItemStack(), EnchantmentEffectHandler::handleStealthEffect, event);
+            checkAndApplyEffect(ModEnchantments.vitality, event.getPlayer(), event.getItemStack(), EnchantmentEffectHandler::handleVitalityEffect, event);
+            checkAndApplyEffect(ModEnchantments.enderPulse, event.getPlayer(), event.getItemStack(), EnchantmentEffectHandler::handleEnderPulseEffect, event);
+            checkAndApplyEffect(ModEnchantments.stealth, event.getPlayer(), event.getItemStack(), EnchantmentEffectHandler::handleStealthEffect, event);
         }
     }
 
     @SubscribeEvent
     public static void onPlayerTick (TickEvent.PlayerTickEvent event) {
 
-        final EntityPlayer player = event.player;
+        final PlayerEntity player = event.player;
         final ItemStack heldItem = player.getHeldItemMainhand();
 
         if (!heldItem.isEmpty()) {
@@ -110,12 +103,12 @@ public class EnchantmentEffectHandler {
 
             if (item != ModItems.adminiumArk && (MSMLegacy.config.isAllowRelics() || !(item instanceof ItemSwordRelic))) {
 
-                event.getEntityLiving().setHeldItem(EnumHand.MAIN_HAND, new ItemStack(item));
+                event.getEntityLiving().setHeldItem(Hand.MAIN_HAND, new ItemStack(item));
             }
         }
     }
 
-    private static void handleExtinctionEffect (EntityLivingBase attacker, EntityLivingBase target, ItemStack item, int level, LivingHurtEvent event) {
+    private static void handleExtinctionEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
         for (final Entity entity : target.world.loadedEntityList) {
 
@@ -126,9 +119,9 @@ public class EnchantmentEffectHandler {
         }
     }
 
-    private static void handleConsumingShadowEffect (EntityLivingBase attacker, EntityLivingBase target, ItemStack item, int level, LivingHurtEvent event) {
+    private static void handleConsumingShadowEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
-        for (final EntityLivingBase entity : EntityUtils.<EntityLivingBase> getEntitiesInArea(EntityLivingBase.class, target.getEntityWorld(), target.getPosition(), level)) {
+        for (final LivingEntity entity : EntityUtils.<LivingEntity> getEntitiesInArea(LivingEntity.class, target.getEntityWorld(), target.getPosition(), level)) {
 
             if (entity != attacker) {
 
@@ -138,13 +131,13 @@ public class EnchantmentEffectHandler {
         }
     }
 
-    private static void handleDecayEffect (EntityLivingBase attacker, EntityLivingBase target, ItemStack item, int level, LivingHurtEvent event) {
+    private static void handleDecayEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
         target.addPotionEffect(new PotionEffect(MobEffects.WITHER, 60 * level));
         target.addPotionEffect(new PotionEffect(MobEffects.HUNGER, 60 * level, level));
     }
 
-    private static void handleDescensionEffect (EntityLivingBase user, ItemStack item, int level) {
+    private static void handleDescensionEffect (LivingEntity user, ItemStack item, int level) {
 
         if (user.isSneaking()) {
 
@@ -153,9 +146,9 @@ public class EnchantmentEffectHandler {
         }
     }
 
-    private static void handleFrostWaveEffect (EntityLivingBase attacker, EntityLivingBase target, ItemStack item, int level, LivingHurtEvent event) {
+    private static void handleFrostWaveEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
-        for (final EntityLivingBase entity : EntityUtils.<EntityLivingBase> getEntitiesInArea(EntityLivingBase.class, target.getEntityWorld(), target.getPosition(), level)) {
+        for (final LivingEntity entity : EntityUtils.<LivingEntity> getEntitiesInArea(LivingEntity.class, target.getEntityWorld(), target.getPosition(), level)) {
 
             if (entity != attacker) {
 
@@ -164,32 +157,32 @@ public class EnchantmentEffectHandler {
         }
     }
 
-    private static void handleFrozenAspectEffect (EntityLivingBase attacker, EntityLivingBase target, ItemStack item, int level, LivingHurtEvent event) {
+    private static void handleFrozenAspectEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
         target.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 200 * level, level));
     }
 
-    private static void handleAscensionEffect (EntityLivingBase attacker, EntityLivingBase target, ItemStack item, int level, LivingHurtEvent event) {
+    private static void handleAscensionEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
         target.addPotionEffect(new PotionEffect(MobEffects.LEVITATION, 30, 4 * level));
     }
 
-    private static void handleEnderAura (EntityLivingBase user, ItemStack item, int level, LivingHurtEvent event) {
+    private static void handleEnderAura (LivingEntity user, ItemStack item, int level, LivingHurtEvent event) {
 
         for (int i = 0; i < 3; i++) {
 
             if (MathsUtils.tryPercentage(0.30d)) {
 
                 final AxisAlignedBB bounds = user.getEntityBoundingBox().grow(30d);
-                final List<Entity> entities = user.world.getEntitiesInAABBexcluding(user, bounds, entity -> entity instanceof EntityLivingBase);
+                final List<Entity> entities = user.world.getEntitiesInAABBexcluding(user, bounds, entity -> entity instanceof LivingEntity);
 
                 if (!entities.isEmpty()) {
 
                     final Entity randomEntity = entities.get(user.world.rand.nextInt(entities.size()));
 
-                    if (randomEntity instanceof EntityLivingBase) {
+                    if (randomEntity instanceof LivingEntity) {
 
-                        final EntityLivingBase living = (EntityLivingBase) randomEntity;
+                        final LivingEntity living = (LivingEntity) randomEntity;
 
                         user.setPositionAndUpdate(living.posX, living.posY, living.posZ);
                     }
@@ -198,7 +191,7 @@ public class EnchantmentEffectHandler {
         }
     }
 
-    private static void handleEnderPulseEffect (EntityLivingBase user, ItemStack item, int level, RightClickItem event) {
+    private static void handleEnderPulseEffect (LivingEntity user, ItemStack item, int level, RightClickItem event) {
 
         final RayTraceResult results = MathsUtils.rayTrace(user, 16d * level);
 
@@ -211,11 +204,11 @@ public class EnchantmentEffectHandler {
         }
     }
 
-    private static void handleGreedEffect (EntityLivingBase attacker, EntityLivingBase target, ItemStack item, int level, LivingHurtEvent event) {
+    private static void handleGreedEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
-        if (target.isNonBoss() && MathsUtils.tryPercentage(0.07 * level) && attacker instanceof EntityPlayer) {
+        if (target.isNonBoss() && MathsUtils.tryPercentage(0.07 * level) && attacker instanceof PlayerEntity) {
 
-            final EntityPlayer player = (EntityPlayer) attacker;
+            final PlayerEntity player = (PlayerEntity) attacker;
             int exp = EntityUtils.getExperiencePoints(target, player);
             exp = net.minecraftforge.event.ForgeEventFactory.getExperienceDrop(target, player, exp);
 
@@ -223,15 +216,15 @@ public class EnchantmentEffectHandler {
         }
     }
 
-    private static void handleWisdomEffect (EntityLivingBase attacker, EntityLivingBase target, ItemStack item, int level, LivingHurtEvent event) {
+    private static void handleWisdomEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
-        if (attacker instanceof EntityPlayer) {
+        if (attacker instanceof PlayerEntity) {
 
-            event.setAmount(event.getAmount() + Math.min(0.625f * level * (((EntityPlayer) attacker).experienceLevel / 25f), 5f * level));
+            event.setAmount(event.getAmount() + Math.min(0.625f * level * (((PlayerEntity) attacker).experienceLevel / 25f), 5f * level));
         }
     }
 
-    private static void handleScornEffect (EntityLivingBase attacker, EntityLivingBase target, ItemStack item, int level, LivingHurtEvent event) {
+    private static void handleScornEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
         if (target.dimension != 0) {
 
@@ -239,27 +232,27 @@ public class EnchantmentEffectHandler {
         }
     }
 
-    private static void handleAbsorbEffect (EntityLivingBase attacker, EntityLivingBase target, ItemStack item, int level, LivingHurtEvent event) {
+    private static void handleAbsorbEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
-        if (attacker instanceof EntityPlayer && MathsUtils.tryPercentage(0.05 * level)) {
+        if (attacker instanceof PlayerEntity && MathsUtils.tryPercentage(0.05 * level)) {
 
-            final EntityPlayer player = (EntityPlayer) attacker;
+            final PlayerEntity player = (PlayerEntity) attacker;
             final int foodAmount = MathsUtils.nextIntInclusive(0, 2);
             player.getFoodStats().addStats(foodAmount, foodAmount);
         }
     }
 
-    private static void handleVenomousAspect (EntityLivingBase attacker, EntityLivingBase target, ItemStack item, int level, LivingHurtEvent event) {
+    private static void handleVenomousAspect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
         target.addPotionEffect(new PotionEffect(MobEffects.POISON, 120 * level, level));
     }
 
-    private static void handleStealthEffect (EntityLivingBase user, ItemStack item, int level, RightClickItem event) {
+    private static void handleStealthEffect (LivingEntity user, ItemStack item, int level, RightClickItem event) {
 
         user.setInvisible(!user.isInvisible());
     }
 
-    private static void handleVitalityEffect (EntityLivingBase attacker, ItemStack item, int level, RightClickItem event) {
+    private static void handleVitalityEffect (LivingEntity attacker, ItemStack item, int level, RightClickItem event) {
 
         item.damageItem(128, attacker);
         attacker.addPotionEffect(new PotionEffect(MobEffects.ABSORPTION, 600, level - 1));
@@ -267,7 +260,7 @@ public class EnchantmentEffectHandler {
         attacker.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 500, level - 1));
     }
 
-    private static void handleFeastEffect (EntityLivingBase attacker, EntityLivingBase target, ItemStack item, int level, LivingHurtEvent event) {
+    private static void handleFeastEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
         if (item.getItemDamage() > 0 && MathsUtils.tryPercentage(0.10 * level)) {
 
@@ -275,9 +268,9 @@ public class EnchantmentEffectHandler {
         }
     }
 
-    private static void handleSparksEffect (EntityLivingBase attacker, EntityLivingBase target, ItemStack item, int level, LivingHurtEvent event) {
+    private static void handleSparksEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
-        for (final EntityLivingBase entity : EntityUtils.<EntityLivingBase> getEntitiesInArea(EntityLivingBase.class, target.getEntityWorld(), target.getPosition(), level)) {
+        for (final LivingEntity entity : EntityUtils.<LivingEntity> getEntitiesInArea(LivingEntity.class, target.getEntityWorld(), target.getPosition(), level)) {
 
             if (entity != attacker && entity != target && !entity.isImmuneToFire() && !entity.isPotionActive(MobEffects.FIRE_RESISTANCE)) {
 
@@ -287,7 +280,7 @@ public class EnchantmentEffectHandler {
         }
     }
 
-    private static void handleIgniteEffect (EntityLivingBase attacker, EntityLivingBase target, ItemStack item, int level, LivingHurtEvent event) {
+    private static void handleIgniteEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
         if (!target.isImmuneToFire() && !target.isPotionActive(MobEffects.FIRE_RESISTANCE)) {
 
@@ -296,7 +289,7 @@ public class EnchantmentEffectHandler {
         }
     }
 
-    private static void checkAndApplyEffect (Enchantment enchant, EntityLivingBase target, EntityLivingBase attacker, ItemStack heldItem, EnchantmentEffectAttack effect, LivingHurtEvent event) {
+    private static void checkAndApplyEffect (Enchantment enchant, LivingEntity target, LivingEntity attacker, ItemStack heldItem, EnchantmentEffectAttack effect, LivingHurtEvent event) {
 
         final int level = EnchantmentHelper.getEnchantmentLevel(enchant, heldItem);
 
@@ -306,7 +299,7 @@ public class EnchantmentEffectHandler {
         }
     }
 
-    private static void checkAndApplyEffect (Enchantment enchant, EntityLivingBase attacker, ItemStack heldItem, EnchantmentEffectItemUse effect, RightClickItem event) {
+    private static void checkAndApplyEffect (Enchantment enchant, LivingEntity attacker, ItemStack heldItem, EnchantmentEffectItemUse effect, RightClickItem event) {
 
         final int level = EnchantmentHelper.getEnchantmentLevel(enchant, heldItem);
 
@@ -316,7 +309,7 @@ public class EnchantmentEffectHandler {
         }
     }
 
-    private static void checkAndApplyEffect (Enchantment enchant, EntityLivingBase user, ItemStack heldItem, EnchantmentEffectAttacked effect, LivingHurtEvent event) {
+    private static void checkAndApplyEffect (Enchantment enchant, LivingEntity user, ItemStack heldItem, EnchantmentEffectAttacked effect, LivingHurtEvent event) {
 
         final int level = EnchantmentHelper.getEnchantmentLevel(enchant, heldItem);
 
@@ -326,7 +319,7 @@ public class EnchantmentEffectHandler {
         }
     }
 
-    private static void checkAndApplyEffect (Enchantment enchantment, EntityLivingBase user, ItemStack heldItem, EnchantmentEffectTick effect) {
+    private static void checkAndApplyEffect (Enchantment enchantment, LivingEntity user, ItemStack heldItem, EnchantmentEffectTick effect) {
 
         final int level = EnchantmentHelper.getEnchantmentLevel(enchantment, heldItem);
 
@@ -338,21 +331,21 @@ public class EnchantmentEffectHandler {
 
     private interface EnchantmentEffectAttack {
 
-        void apply (EntityLivingBase attacker, EntityLivingBase target, ItemStack item, int level, LivingHurtEvent event);
+        void apply (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event);
     }
 
     private interface EnchantmentEffectItemUse {
 
-        void apply (EntityLivingBase attacker, ItemStack item, int level, RightClickItem event);
+        void apply (LivingEntity attacker, ItemStack item, int level, RightClickItem event);
     }
 
     private interface EnchantmentEffectAttacked {
 
-        void apply (EntityLivingBase user, ItemStack item, int level, LivingHurtEvent event);
+        void apply (LivingEntity user, ItemStack item, int level, LivingHurtEvent event);
     }
 
     private interface EnchantmentEffectTick {
 
-        void apply (EntityLivingBase user, ItemStack item, int level);
+        void apply (LivingEntity user, ItemStack item, int level);
     }
 }
