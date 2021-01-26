@@ -1,35 +1,35 @@
 package net.darkhax.msmlegacy.item;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
+import net.minecraft.item.ItemTier;
+import net.minecraft.item.SwordItem;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class ItemSwordRelic extends ItemSword {
+import javax.annotation.Nullable;
+import java.util.List;
+
+public class ItemSwordRelic extends SwordItem {
 
     private static int maxRelics = 0;
     private final int relicIndex;
 
-    public ItemSwordRelic () {
-
-        super(ToolMaterial.IRON);
+    public ItemSwordRelic(Properties properties) {
+        super(ItemTier.IRON,3, -2.4F,properties);
         maxRelics++;
         this.relicIndex = maxRelics;
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
-    public void addInformation (ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
-
-        tooltip.add(TextFormatting.LIGHT_PURPLE + I18n.format("jei." + this.getTranslationKey()));
-        tooltip.add(TextFormatting.GOLD + I18n.format("msmlegacy.relic.count", this.relicIndex, maxRelics));
+    @OnlyIn(Dist.CLIENT)
+    public void addInformation (ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        tooltip.add(new TranslationTextComponent("jei." + this.getTranslationKey()).mergeStyle(TextFormatting.LIGHT_PURPLE));
+        tooltip.add(new TranslationTextComponent("msmlegacy.relic.count", this.relicIndex, maxRelics).mergeStyle(TextFormatting.GOLD));
     }
 }

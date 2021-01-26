@@ -1,44 +1,57 @@
 package net.darkhax.msmlegacy;
 
-import java.io.File;
-
-import org.apache.commons.lang3.EnumUtils;
-
 import net.darkhax.msmlegacy.enchantment.EnchantmentKeenEdge;
 import net.darkhax.msmlegacy.enchantment.EnchantmentSwordLegacy;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantment.Rarity;
-import net.minecraft.enchantment.EnumEnchantmentType;
+import net.minecraft.enchantment.EnchantmentType;
 import net.minecraft.item.Item;
-import net.minecraft.item.Item.ToolMaterial;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.util.EnumHelper;
+import net.minecraftforge.common.ForgeConfigSpec;
+import org.apache.commons.lang3.EnumUtils;
 
 public class ConfigurationHandler {
 
-    private final Configuration config;
-    private boolean allowEnchOnAllSwords = false;
-    private float spawnChance = 0.01f;
+    private ForgeConfigSpec.BooleanValue allowEnchOnAllSwords;
+    private ForgeConfigSpec.DoubleValue spawnChance;
 
-	private boolean allowRelics = true;
+	private ForgeConfigSpec.BooleanValue allowRelics;
 
-    public ConfigurationHandler (File configFile) {
+	public static MSMMaterial DAWN_STAR;
+    public static MSMMaterial VAMPIRIC_BLADE;
+    public static MSMMaterial GLADIOLUS;
+    public static MSMMaterial DRACONIC_BLADE;
+    public static MSMMaterial EYE_END_BLADE;
+    public static MSMMaterial CRYSTALINE_BLADE;
+    public static MSMMaterial GLACIAL_BLADE;
+    public static MSMMaterial AETHERS_GUARD;
+    public static MSMMaterial WITHER_BANE;
+    public static MSMMaterial ADMINIUM_ARK;
 
-        this.config = new Configuration(configFile);
-        this.allowEnchOnAllSwords = this.config.getBoolean("allowEnchOnAllSwords", Configuration.CATEGORY_GENERAL, false, "When enabled, all new enchantments will be available for all swords, including vanilla and modded swords.");
-        this.spawnChance = this.config.getFloat("spawnChance", "general", 0.01f, 0f, 1f, "The chance of a mob spawning with one of the items from this mod.");
-        this.allowRelics = this.config.getBoolean("allowRelicSpawning", "general", true, "Whether or not mobs can spawn with the relic swords.");
-    }
 
-    public ToolMaterial getMaterial (String name, int harvestLevel, int maxUses, int efficiency, int damage, int enchantability) {
 
-        harvestLevel = this.config.getInt("harvestLevel", name, harvestLevel, 0, 128, "The block harvesting level of the sword's material.");
-        maxUses = this.config.getInt("durability", name, maxUses, 0, Integer.MAX_VALUE, "The durability of the sword.");
-        efficiency = this.config.getInt("efficiency", name, efficiency, 0, 128, "The block efficiency of the sword's material.");
-        damage = this.config.getInt("damage", name, damage, 0, Integer.MAX_VALUE, "The damage of the sword.") - 4;
-        enchantability = this.config.getInt("enchatability", name, enchantability, 0, 512, "The enchantability of the sword.");
 
-        return EnumHelper.addToolMaterial("MSM_LEGACY_" + name.toUpperCase(), harvestLevel, maxUses, efficiency, damage, enchantability);
+    //this occurs long before any items are registered
+    public ConfigurationHandler (ForgeConfigSpec.Builder builder) {
+        builder.push("general");
+        this.allowEnchOnAllSwords = builder.comment("When enabled, all new enchantments will be available for all swords, including vanilla and modded swords.")
+                .define("allowEnchOnAllSwords", false);
+
+        this.spawnChance = builder.comment("The chance of a mob spawning with one of the items from this mod.")
+                .defineInRange("spawnChance",0.01f, 0f, 1f);
+
+        this.allowRelics = builder.comment("Whether or not mobs can spawn with the relic swords.")
+                .define("allowRelicSpawning", true);
+
+        DAWN_STAR = MSMMaterial.build(builder,"dawn_star", 3, 1286, 8, 6, 22);
+        VAMPIRIC_BLADE = MSMMaterial.build(builder,"vampiric_blade", 3, 812, 8, 7, 12);
+        GLADIOLUS = MSMMaterial.build(builder,"gladiolus", 3, 645, 8, 6, 10);
+        DRACONIC_BLADE = MSMMaterial.build(builder,"draconic_blade", 3, 1089, 8, 7, 16);
+        EYE_END_BLADE = MSMMaterial.build(builder,"eye_end_blade",3, 1580, 8, 8, 22);
+        CRYSTALINE_BLADE = MSMMaterial.build(builder,"crystaline_blade",3, 570, 8, 5, 28);
+        GLACIAL_BLADE = MSMMaterial.build(builder,"glacial_blade", 3, 680, 8, 6, 15);
+        AETHERS_GUARD = MSMMaterial.build(builder,"aethers_guard", 3, 1796, 8, 8, 22);
+        WITHER_BANE = MSMMaterial.build(builder,"wither_bane", 3, 1869, 8, 6, 16);
+        ADMINIUM_ARK = MSMMaterial.build(builder,"adminium_ark",  3, 9999999, 8, 99999, 999);
     }
 
     public Enchantment getSwordEnchantment (String id, Item sword, Rarity rarity, int min, int max) {
@@ -49,7 +62,7 @@ public class ConfigurationHandler {
     public Enchantment getSwordEnchantment (String id, Item sword, Rarity rarity, int min, int max, boolean survivalAllowed) {
 
         final String category = sword.getRegistryName().getPath();
-        final EnumEnchantmentType type = this.allowEnchOnAllSwords && survivalAllowed ? EnumEnchantmentType.WEAPON : EnumHelper.addEnchantmentType("MSM_LEGACY_" + id.toUpperCase(), item -> item == sword);
+        final EnchantmentType type = this.allowEnchOnAllSwords && survivalAllowed ? EnumEnchantmentType.WEAPON : EnumHelper.addEnchantmentType("MSM_LEGACY_" + id.toUpperCase(), item -> item == sword);
         rarity = this.getRarity(id, rarity, category, "The rarity for the " + id + " enchantment. Accepts COMMON, UNCOMMON, RARE, VERY_RARE");
         min = this.config.getInt("minLevel_" + id, category, min, 1, 128, "The min level for the " + id + " enchantment.");
         max = this.config.getInt("maxLevel_" + id, category, max, min, 128, "The max level for the " + id + " enchantment.");
@@ -61,7 +74,7 @@ public class ConfigurationHandler {
     public Enchantment getKeenEdge (String id, Item sword, Rarity rarity, int min, int max) {
 
         final String category = sword.getRegistryName().getPath();
-        final EnumEnchantmentType type = this.allowEnchOnAllSwords && true ? EnumEnchantmentType.WEAPON : EnumHelper.addEnchantmentType("MSM_LEGACY_" + id.toUpperCase(), item -> item == sword);
+        final EnchantmentType type = this.allowEnchOnAllSwords && true ? EnumEnchantmentType.WEAPON : EnumHelper.addEnchantmentType("MSM_LEGACY_" + id.toUpperCase(), item -> item == sword);
         rarity = this.getRarity(id, rarity, category, "The rarity for the " + id + " enchantment. Accepts COMMON, UNCOMMON, RARE, VERY_RARE");
         min = this.config.getInt("minLevel_" + id, category, min, 1, 128, "The min level for the " + id + " enchantment.");
         max = this.config.getInt("maxLevel_" + id, category, max, min, 128, "The max level for the " + id + " enchantment.");
@@ -84,18 +97,10 @@ public class ConfigurationHandler {
     }
 
     public float getSpawnChance() {
-		return spawnChance;
+		return spawnChance.get();
 	}
 
 	public boolean isAllowRelics() {
-		return allowRelics;
+		return allowRelics.get();
 	}
-	
-    public void syncConfigData () {
-
-        if (this.config.hasChanged()) {
-
-            this.config.save();
-        }
-    }
 }

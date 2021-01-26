@@ -1,26 +1,29 @@
 package net.darkhax.msmlegacy.jei;
 
 import mezz.jei.api.IModPlugin;
-import mezz.jei.api.IModRegistry;
-import mezz.jei.api.JEIPlugin;
-import mezz.jei.api.ingredients.VanillaTypes;
+import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.registration.IModIngredientRegistration;
+import mezz.jei.api.registration.IRecipeRegistration;
 import net.darkhax.msmlegacy.MSMLegacy;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraft.util.ResourceLocation;
 
-@JEIPlugin
+@JeiPlugin
 public class MSMLegacyJEI implements IModPlugin {
 
-    @Instance("msmlegacy")
-    public static MSMLegacy msm;
-
     @Override
-    public void register (IModRegistry registry) {
+    public void registerRecipes(IRecipeRegistration registry) {
 
-        for (final Item item : msm.registry.getItems()) {
+        for (final Item item : MSMLegacy.getItems()) {
 
             registry.addIngredientInfo(new ItemStack(item), VanillaTypes.ITEM, "jei." + item.getTranslationKey());
         }
+    }
+
+    @Override
+    public ResourceLocation getPluginUid() {
+        return new ResourceLocation(MSMLegacy.MODID,MSMLegacy.MODID);
     }
 }

@@ -1,45 +1,48 @@
 package net.darkhax.msmlegacy.enchantment;
 
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnumEnchantmentType;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.enchantment.EnchantmentType;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.BookItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBook;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.ForgeConfigSpec;
 
 public class EnchantmentSwordLegacy extends Enchantment {
 
-    private static final EntityEquipmentSlot[] slots = new EntityEquipmentSlot[] { EntityEquipmentSlot.MAINHAND };
+    private static final EquipmentSlotType[] slots = new EquipmentSlotType[] { EquipmentSlotType.MAINHAND };
 
     private final Item intendedItem;
-    private final int minLevel;
-    private final int maxLevel;
+    public ForgeConfigSpec.IntValue minLevel;
+    public ForgeConfigSpec.IntValue maxLevel;
     private final boolean isVanillaAllowed;
 
-    public EnchantmentSwordLegacy (Rarity rarityIn, Item item, EnumEnchantmentType typeIn, int min, int max, boolean isVanillaAllowed) {
+    protected EnchantmentSwordLegacy (Rarity rarityIn, Item item, EnchantmentType typeIn, boolean isVanillaAllowed) {
 
         super(rarityIn, typeIn, slots);
         this.intendedItem = item;
-        this.minLevel = min;
-        this.maxLevel = max;
         this.isVanillaAllowed = isVanillaAllowed;
+    }
+
+    public static EnchantmentSwordLegacy build(int minLevel,int maxLevel) {
+
     }
 
     @Override
     public int getMinLevel () {
 
-        return this.minLevel;
+        return this.minLevel.get();
     }
 
     @Override
     public int getMaxLevel () {
 
-        return this.maxLevel;
+        return this.maxLevel.get();
     }
     
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack) {
 
-        return (!(stack.getItem() instanceof ItemBook) || isVanillaAllowed) && super.canApplyAtEnchantingTable(stack);
+        return (!(stack.getItem() instanceof BookItem) || isVanillaAllowed) && super.canApplyAtEnchantingTable(stack);
     }
 }

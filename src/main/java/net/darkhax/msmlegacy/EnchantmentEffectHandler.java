@@ -4,6 +4,8 @@ import java.util.List;
 
 import net.darkhax.bookshelf.util.EntityUtils;
 import net.darkhax.bookshelf.util.MathsUtils;
+import net.darkhax.msmlegacy.init.ModEnchantments;
+import net.darkhax.msmlegacy.init.ModItems;
 import net.darkhax.msmlegacy.item.ItemSwordRelic;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -50,20 +52,20 @@ public class EnchantmentEffectHandler {
 
             if (!heldItem.isEmpty()) {
 
-                checkAndApplyEffect(msm.ignite, target, attacker, heldItem, EnchantmentEffectHandler::handleIgniteEffect, event);
-                checkAndApplyEffect(msm.sparks, target, attacker, heldItem, EnchantmentEffectHandler::handleSparksEffect, event);
-                checkAndApplyEffect(msm.feast, target, attacker, heldItem, EnchantmentEffectHandler::handleFeastEffect, event);
-                checkAndApplyEffect(msm.venomousAspect, target, attacker, heldItem, EnchantmentEffectHandler::handleVenomousAspect, event);
-                checkAndApplyEffect(msm.absorb, target, attacker, heldItem, EnchantmentEffectHandler::handleAbsorbEffect, event);
-                checkAndApplyEffect(msm.scorn, target, attacker, heldItem, EnchantmentEffectHandler::handleScornEffect, event);
-                checkAndApplyEffect(msm.greed, target, attacker, heldItem, EnchantmentEffectHandler::handleGreedEffect, event);
-                checkAndApplyEffect(msm.wisdom, target, attacker, heldItem, EnchantmentEffectHandler::handleWisdomEffect, event);
-                checkAndApplyEffect(msm.frozenAspect, target, attacker, heldItem, EnchantmentEffectHandler::handleFrozenAspectEffect, event);
-                checkAndApplyEffect(msm.frostWave, target, attacker, heldItem, EnchantmentEffectHandler::handleFrostWaveEffect, event);
-                checkAndApplyEffect(msm.ascension, target, attacker, heldItem, EnchantmentEffectHandler::handleAscensionEffect, event);
-                checkAndApplyEffect(msm.decay, target, attacker, heldItem, EnchantmentEffectHandler::handleDecayEffect, event);
-                checkAndApplyEffect(msm.consumingShadows, target, attacker, heldItem, EnchantmentEffectHandler::handleConsumingShadowEffect, event);
-                checkAndApplyEffect(msm.extinction, target, attacker, heldItem, EnchantmentEffectHandler::handleExtinctionEffect, event);
+                checkAndApplyEffect(ModEnchantments.ignite, target, attacker, heldItem, EnchantmentEffectHandler::handleIgniteEffect, event);
+                checkAndApplyEffect(ModEnchantments.sparks, target, attacker, heldItem, EnchantmentEffectHandler::handleSparksEffect, event);
+                checkAndApplyEffect(ModEnchantments.feast, target, attacker, heldItem, EnchantmentEffectHandler::handleFeastEffect, event);
+                checkAndApplyEffect(ModEnchantments.venomousAspect, target, attacker, heldItem, EnchantmentEffectHandler::handleVenomousAspect, event);
+                checkAndApplyEffect(ModEnchantments.absorb, target, attacker, heldItem, EnchantmentEffectHandler::handleAbsorbEffect, event);
+                checkAndApplyEffect(ModEnchantments.scorn, target, attacker, heldItem, EnchantmentEffectHandler::handleScornEffect, event);
+                checkAndApplyEffect(ModEnchantments.greed, target, attacker, heldItem, EnchantmentEffectHandler::handleGreedEffect, event);
+                checkAndApplyEffect(ModEnchantments.wisdom, target, attacker, heldItem, EnchantmentEffectHandler::handleWisdomEffect, event);
+                checkAndApplyEffect(ModEnchantments.frozenAspect, target, attacker, heldItem, EnchantmentEffectHandler::handleFrozenAspectEffect, event);
+                checkAndApplyEffect(ModEnchantments.frostWave, target, attacker, heldItem, EnchantmentEffectHandler::handleFrostWaveEffect, event);
+                checkAndApplyEffect(ModEnchantments.ascension, target, attacker, heldItem, EnchantmentEffectHandler::handleAscensionEffect, event);
+                checkAndApplyEffect(ModEnchantments.decay, target, attacker, heldItem, EnchantmentEffectHandler::handleDecayEffect, event);
+                checkAndApplyEffect(ModEnchantments.consumingShadows, target, attacker, heldItem, EnchantmentEffectHandler::handleConsumingShadowEffect, event);
+                checkAndApplyEffect(ModEnchantments.extinction, target, attacker, heldItem, EnchantmentEffectHandler::handleExtinctionEffect, event);
             }
         }
 
@@ -72,7 +74,7 @@ public class EnchantmentEffectHandler {
 
         if (!userItem.isEmpty()) {
 
-            checkAndApplyEffect(msm.enderAura, user, userItem, EnchantmentEffectHandler::handleEnderAura, event);
+            checkAndApplyEffect(ModEnchantments.enderAura, user, userItem, EnchantmentEffectHandler::handleEnderAura, event);
         }
     }
 
@@ -81,9 +83,9 @@ public class EnchantmentEffectHandler {
 
         if (!event.getItemStack().isEmpty() && event.getHand() == EnumHand.MAIN_HAND) {
 
-            checkAndApplyEffect(msm.vitality, event.getEntityPlayer(), event.getItemStack(), EnchantmentEffectHandler::handleVitalityEffect, event);
-            checkAndApplyEffect(msm.enderPulse, event.getEntityPlayer(), event.getItemStack(), EnchantmentEffectHandler::handleEnderPulseEffect, event);
-            checkAndApplyEffect(msm.stealth, event.getEntityPlayer(), event.getItemStack(), EnchantmentEffectHandler::handleStealthEffect, event);
+            checkAndApplyEffect(ModEnchantments.vitality, event.getEntityPlayer(), event.getItemStack(), EnchantmentEffectHandler::handleVitalityEffect, event);
+            checkAndApplyEffect(ModEnchantments.enderPulse, event.getEntityPlayer(), event.getItemStack(), EnchantmentEffectHandler::handleEnderPulseEffect, event);
+            checkAndApplyEffect(ModEnchantments.stealth, event.getEntityPlayer(), event.getItemStack(), EnchantmentEffectHandler::handleStealthEffect, event);
         }
     }
 
@@ -95,7 +97,7 @@ public class EnchantmentEffectHandler {
 
         if (!heldItem.isEmpty()) {
 
-            checkAndApplyEffect(msm.descension, player, heldItem, EnchantmentEffectHandler::handleDescensionEffect);
+            checkAndApplyEffect(ModEnchantments.descension, player, heldItem, EnchantmentEffectHandler::handleDescensionEffect);
         }
     }
 
@@ -106,7 +108,7 @@ public class EnchantmentEffectHandler {
 
             final Item item = msm.registry.getItems().get(event.getWorld().rand.nextInt(msm.registry.getItems().size()));
 
-            if (item != msm.adminiumArk && (MSMLegacy.config.isAllowRelics() || !(item instanceof ItemSwordRelic))) {
+            if (item != ModItems.adminiumArk && (MSMLegacy.config.isAllowRelics() || !(item instanceof ItemSwordRelic))) {
 
                 event.getEntityLiving().setHeldItem(EnumHand.MAIN_HAND, new ItemStack(item));
             }
