@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " ss",
+    "qns",
+    "kq "
+  ],
+  "key": {
+    "k": {
+      "item": "minecraft:soul_sand"
+    },
+    "q": {
+      "tag": "forge:gems/quartz"
+    },
+    "n": {
+      "item": "minecraft:nether_star"
+    },
+    "s": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "result": {
+    "item": "msmlegacy:wither_bane"
+  }
+}

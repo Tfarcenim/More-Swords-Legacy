@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "msmlegacy:dawn_star"
+    ]
+  },
+  "criteria": {
+    "has_fire_charge": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "minecraft:fire_charge"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "msmlegacy:dawn_star"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_fire_charge",
+      "has_the_recipe"
+    ]
+  ]
+}

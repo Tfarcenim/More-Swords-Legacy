@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " ip",
+    "ipi",
+    "si "
+  ],
+  "key": {
+    "i": {
+      "item": "minecraft:ice"
+    },
+    "p": {
+      "item": "minecraft:packed_ice"
+    },
+    "s": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "result": {
+    "item": "msmlegacy:glacial_blade"
+  }
+}

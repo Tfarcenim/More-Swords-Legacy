@@ -16,11 +16,12 @@ public class EnchantmentKeenEdge extends EnchantmentSwordLegacy {
 		super(item, typeIn, isVanillaAllowed);
 	}
 
-	public static EnchantmentKeenEdge build(ForgeConfigSpec.Builder builder, String name, Supplier<Item> sword, Rarity rarity, int maxLevel, int minLevel, boolean vanillaAllowed) {
+	public static EnchantmentKeenEdge build1(ForgeConfigSpec.Builder builder, String name, Supplier<Item> sword, Rarity rarity, int maxLevel, int minLevel, boolean vanillaAllowed) {
 		builder.push(name);
-		final EnchantmentType type = ConfigurationHandler.allowEnchOnAllSwords.get() && vanillaAllowed ? EnchantmentType.WEAPON :
+		final EnchantmentType type = /*ConfigurationHandler.allowEnchOnAllSwords.get() &&*/ vanillaAllowed ? EnchantmentType.WEAPON :
 				EnchantmentType.create(name.toUpperCase(Locale.ROOT), item -> item == sword.get());
 		EnchantmentKeenEdge enchantmentSwordLegacy = new EnchantmentKeenEdge(sword, type, vanillaAllowed);
+		enchantmentSwordLegacy.setRegistryName(name);
 		enchantmentSwordLegacy.rarity = builder.comment("The rarity for the " + name + " enchantment").defineEnum("rarity", rarity);
 		enchantmentSwordLegacy.minLevel = builder.comment("The min level for the " + name + " enchantment.").defineInRange("minLevel", minLevel, 1, 128);
 		enchantmentSwordLegacy.maxLevel = builder.comment("The max level for the " + name + " enchantment.").defineInRange("maxLevel", maxLevel, minLevel, 128);

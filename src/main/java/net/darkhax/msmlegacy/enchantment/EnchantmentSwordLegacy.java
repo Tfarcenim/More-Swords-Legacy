@@ -29,15 +29,16 @@ public class EnchantmentSwordLegacy extends Enchantment {
         this.isVanillaAllowed = isVanillaAllowed;
     }
 
-    public static EnchantmentSwordLegacy build(ForgeConfigSpec.Builder builder, String name, Supplier<Item> sword, Rarity rarity, int maxLevel, int minLevel) {
-        return build(builder, name, sword, rarity, maxLevel, minLevel,true);
+    public static EnchantmentSwordLegacy build(ForgeConfigSpec.Builder builder, String name, Supplier<Item> sword, Rarity rarity, int minLevel, int maxLevel) {
+        return build(builder, name, sword, rarity, minLevel, maxLevel, true);
     }
 
-    public static EnchantmentSwordLegacy build(ForgeConfigSpec.Builder builder, String name, Supplier<Item> sword, Rarity rarity, int maxLevel, int minLevel, boolean vanillaAllowed) {
+    public static EnchantmentSwordLegacy build(ForgeConfigSpec.Builder builder, String name, Supplier<Item> sword, Rarity rarity, int minLevel, int maxLevel, boolean vanillaAllowed) {
         builder.push(name);
-        final EnchantmentType type = ConfigurationHandler.allowEnchOnAllSwords.get() && vanillaAllowed ? EnchantmentType.WEAPON :
+        final EnchantmentType type = /*ConfigurationHandler.allowEnchOnAllSwords.get() &&*/ vanillaAllowed ? EnchantmentType.WEAPON :
                 EnchantmentType.create(name.toUpperCase(Locale.ROOT), item -> item == sword.get());
         EnchantmentSwordLegacy enchantmentSwordLegacy = new EnchantmentSwordLegacy(sword, type, vanillaAllowed);
+        enchantmentSwordLegacy.setRegistryName(name);
         enchantmentSwordLegacy.rarity = builder.comment("The rarity for the " + name + " enchantment").defineEnum("rarity", rarity);
         enchantmentSwordLegacy.minLevel = builder.comment("The min level for the " + name + " enchantment.").defineInRange("minLevel", minLevel, 1, 128);
         enchantmentSwordLegacy.maxLevel = builder.comment("The max level for the " + name + " enchantment.").defineInRange("maxLevel", maxLevel, minLevel, 128);

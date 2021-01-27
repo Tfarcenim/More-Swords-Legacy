@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " bb",
+    "fcb",
+    "sf "
+  ],
+  "key": {
+    "b": {
+      "item": "minecraft:bedrock"
+    },
+    "f": {
+      "item": "minecraft:end_portal_frame"
+    },
+    "c": {
+      "item": "minecraft:command_block"
+    },
+    "s": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "result": {
+    "item": "msmlegacy:adminium_ark"
+  }
+}

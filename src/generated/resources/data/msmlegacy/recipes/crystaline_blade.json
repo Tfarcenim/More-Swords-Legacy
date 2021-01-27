@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " gg",
+    "qpg",
+    "sq "
+  ],
+  "key": {
+    "g": {
+      "tag": "forge:glass"
+    },
+    "p": {
+      "tag": "forge:glass_panes"
+    },
+    "q": {
+      "tag": "forge:gems/quartz"
+    },
+    "s": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "result": {
+    "item": "msmlegacy:crystaline_blade"
+  }
+}

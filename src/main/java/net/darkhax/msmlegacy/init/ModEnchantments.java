@@ -5,6 +5,10 @@ import net.darkhax.msmlegacy.enchantment.EnchantmentSwordLegacy;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraftforge.common.ForgeConfigSpec;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
 public class ModEnchantments {
     public static Enchantment ignite;
     public static Enchantment sparks;
@@ -37,7 +41,7 @@ public class ModEnchantments {
         ModEnchantments.venomousAspect = EnchantmentSwordLegacy.build(builder,"venomous_aspect", () -> ModItems.gladiolus, Enchantment.Rarity.COMMON, 1, 3);
         ModEnchantments.absorb = EnchantmentSwordLegacy.build(builder,"absorb", () -> ModItems.gladiolus, Enchantment.Rarity.RARE, 1, 1);
 
-        ModEnchantments.keenEdge = EnchantmentKeenEdge.build(builder,"keen_edge", () -> ModItems.draconicBlade, Enchantment.Rarity.COMMON, 1, 3);
+        ModEnchantments.keenEdge = EnchantmentKeenEdge.build1(builder,"keen_edge", () -> ModItems.draconicBlade, Enchantment.Rarity.COMMON, 1, 3,true);
         ModEnchantments.scorn = EnchantmentSwordLegacy.build(builder,"scorn", () -> ModItems.draconicBlade, Enchantment.Rarity.RARE, 1, 1);
 
         ModEnchantments.enderPulse = EnchantmentSwordLegacy.build(builder,"ender_pulse", () -> ModItems.eyeEndBlade, Enchantment.Rarity.COMMON, 1, 3);
@@ -57,5 +61,22 @@ public class ModEnchantments {
 
         ModEnchantments.stealth = EnchantmentSwordLegacy.build(builder,"stealth", () -> ModItems.adminiumArk, Enchantment.Rarity.COMMON, 1, 1, false);
         ModEnchantments.extinction = EnchantmentSwordLegacy.build(builder,"extinction", () -> ModItems.adminiumArk, Enchantment.Rarity.RARE, 1, 1, false);
+    }
+
+    private static List<Enchantment> enchantments;
+
+    public static List<Enchantment> getEnchantments() {
+        if (enchantments == null) {
+            Field[] fields = ModEnchantments.class.getFields();
+            enchantments = new ArrayList<>();
+            for (Field field : fields) {
+                try {
+                    enchantments.add((Enchantment) field.get(null));
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return enchantments;
     }
 }

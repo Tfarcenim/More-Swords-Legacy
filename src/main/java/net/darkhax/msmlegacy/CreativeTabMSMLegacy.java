@@ -12,7 +12,7 @@ public class CreativeTabMSMLegacy extends ItemGroup {
 
     public CreativeTabMSMLegacy () {
 
-        super("msmlegacy");
+        super(MSMLegacy.MODID);
     }
 
     @Override
@@ -20,7 +20,7 @@ public class CreativeTabMSMLegacy extends ItemGroup {
 
         if (this.iconStack == null) {
 
-            final Item item = Registry.ITEM.getOrDefault(new ResourceLocation("msmlegacy", "adminium_ark"));
+            final Item item = Registry.ITEM.getOrDefault(new ResourceLocation(MSMLegacy.MODID, "adminium_ark"));
             this.iconStack = new ItemStack(item);
         }
 

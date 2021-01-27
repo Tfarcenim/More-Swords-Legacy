@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "fdg",
+    "dgi",
+    "sif"
+  ],
+  "key": {
+    "f": {
+      "tag": "forge:feathers"
+    },
+    "d": {
+      "tag": "forge:gems/diamond"
+    },
+    "g": {
+      "item": "minecraft:glowstone"
+    },
+    "i": {
+      "tag": "forge:ingots/iron"
+    },
+    "s": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "result": {
+    "item": "msmlegacy:aethers_guard"
+  }
+}

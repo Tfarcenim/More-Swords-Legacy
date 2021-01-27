@@ -1,24 +1,30 @@
 package net.darkhax.msmlegacy;
 
-import java.util.List;
-
 import net.darkhax.msmlegacy.init.ModEnchantments;
 import net.darkhax.msmlegacy.init.ModItems;
 import net.darkhax.msmlegacy.item.ItemSwordRelic;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ExperienceBottleEntity;
+import net.minecraft.entity.item.ExperienceOrbEntity;
+import net.minecraft.entity.monster.SkeletonEntity;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.RayTraceResult.Type;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent.SpecialSpawn;
@@ -26,13 +32,22 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
-@EventBusSubscriber(modid = "msmlegacy")
+@EventBusSubscriber(modid = MSMLegacy.MODID)
 public class EnchantmentEffectHandler {
 
-    @Instance("msmlegacy")
-    public static MSMLegacy msm;
+    public static final Method calculateXP;
+
+    static {
+        calculateXP = ObfuscationReflectionHelper.findMethod(LivingEntity.class,"func_70693_a",PlayerEntity.class);
+    }
 
     @SubscribeEvent
     public static void onDamageMob (LivingHurtEvent event) {
@@ -96,12 +111,12 @@ public class EnchantmentEffectHandler {
 
     @SubscribeEvent
     public static void onSpecialSpawn (SpecialSpawn event) {
+        LivingEntity livingEntity = event.getEntityLiving();
+        if ((event.getEntity() instanceof SkeletonEntity || event.getEntity() instanceof ZombieEntity) && Math.random() < ConfigurationHandler.getSpawnChance()) {
 
-        if ((event.getEntity() instanceof EntitySkeleton || event.getEntity() instanceof EntityZombie) && MathsUtils.tryPercentage(MSMLegacy.config.getSpawnChance())) {
+            final Item item = ModItems.items.get(livingEntity.getRNG().nextInt(ModItems.items.size()));
 
-            final Item item = msm.registry.getItems().get(event.getWorld().rand.nextInt(msm.registry.getItems().size()));
-
-            if (item != ModItems.adminiumArk && (MSMLegacy.config.isAllowRelics() || !(item instanceof ItemSwordRelic))) {
+            if (item != ModItems.adminiumArk && (ConfigurationHandler.isAllowRelics() || !(item instanceof ItemSwordRelic))) {
 
                 event.getEntityLiving().setHeldItem(Hand.MAIN_HAND, new ItemStack(item));
             }
@@ -110,70 +125,69 @@ public class EnchantmentEffectHandler {
 
     private static void handleExtinctionEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
-        for (final Entity entity : target.world.loadedEntityList) {
+        for (final Entity entity : ((ServerWorld)target.world).getEntities().collect(Collectors.toList())) {
 
-            if (entity instanceof EntityLiving && entity != attacker && entity.getClass() == target.getClass()) {
+            if (entity instanceof LivingEntity && entity != attacker && entity.getClass() == target.getClass()) {
 
-                entity.setDead();
+                entity.remove();
             }
         }
     }
 
     private static void handleConsumingShadowEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
-
-        for (final LivingEntity entity : EntityUtils.<LivingEntity> getEntitiesInArea(LivingEntity.class, target.getEntityWorld(), target.getPosition(), level)) {
+        AxisAlignedBB bb = new AxisAlignedBB(target.getPosition().add(-level,-level,-level),target.getPosition().add(level,level,level));
+        for (final LivingEntity entity : target.world.getEntitiesWithinAABB(LivingEntity.class,bb)) {
 
             if (entity != attacker) {
-
-                entity.addPotionEffect(new PotionEffect(MobEffects.WITHER, 60 * level, level));
-                target.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 60 * level, level));
+                entity.addPotionEffect(new EffectInstance(Effects.WITHER, 60 * level, level));
+                target.addPotionEffect(new EffectInstance(Effects.BLINDNESS, 60 * level, level));
             }
         }
     }
 
     private static void handleDecayEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
-        target.addPotionEffect(new PotionEffect(MobEffects.WITHER, 60 * level));
-        target.addPotionEffect(new PotionEffect(MobEffects.HUNGER, 60 * level, level));
+        target.addPotionEffect(new EffectInstance(Effects.WITHER, 60 * level));
+        target.addPotionEffect(new EffectInstance(Effects.HUNGER, 60 * level, level));
     }
 
     private static void handleDescensionEffect (LivingEntity user, ItemStack item, int level) {
 
         if (user.isSneaking()) {
-
-            user.motionY *= 0.6;
+            Vector3d motion = user.getMotion();
+            user.setMotion(motion.x,motion.y * .6,motion.z);
             user.fallDistance = 0;
         }
     }
 
     private static void handleFrostWaveEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
-
-        for (final LivingEntity entity : EntityUtils.<LivingEntity> getEntitiesInArea(LivingEntity.class, target.getEntityWorld(), target.getPosition(), level)) {
+        AxisAlignedBB bb = new AxisAlignedBB(target.getPosition().add(-level,-level,-level),target.getPosition().add(level,level,level));
+        for (final LivingEntity entity : target.world.getEntitiesWithinAABB(LivingEntity.class,bb)) {
 
             if (entity != attacker) {
 
-                entity.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 100 * level, level));
+                entity.addPotionEffect(new EffectInstance(Effects.SLOWNESS, 100 * level, level));
             }
         }
     }
 
     private static void handleFrozenAspectEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
-        target.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 200 * level, level));
+        target.addPotionEffect(new EffectInstance(Effects.SLOWNESS, 200 * level, level));
     }
 
     private static void handleAscensionEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
-        target.addPotionEffect(new PotionEffect(MobEffects.LEVITATION, 30, 4 * level));
+        target.addPotionEffect(new EffectInstance(Effects.LEVITATION, 30, 4 * level));
     }
 
     private static void handleEnderAura (LivingEntity user, ItemStack item, int level, LivingHurtEvent event) {
 
         for (int i = 0; i < 3; i++) {
 
-            if (MathsUtils.tryPercentage(0.30d)) {
+            if (Math.random() < 0.30d) {
 
-                final AxisAlignedBB bounds = user.getEntityBoundingBox().grow(30d);
+                final AxisAlignedBB bounds = user.getBoundingBox().grow(30d);
                 final List<Entity> entities = user.world.getEntitiesInAABBexcluding(user, bounds, entity -> entity instanceof LivingEntity);
 
                 if (!entities.isEmpty()) {
@@ -184,7 +198,7 @@ public class EnchantmentEffectHandler {
 
                         final LivingEntity living = (LivingEntity) randomEntity;
 
-                        user.setPositionAndUpdate(living.posX, living.posY, living.posZ);
+                        user.setPositionAndUpdate(living.getPosX(), living.getPosY(), living.getPosZ());
                     }
                 }
             }
@@ -193,26 +207,31 @@ public class EnchantmentEffectHandler {
 
     private static void handleEnderPulseEffect (LivingEntity user, ItemStack item, int level, RightClickItem event) {
 
-        final RayTraceResult results = MathsUtils.rayTrace(user, 16d * level);
+        final RayTraceResult results = user.pick( 16d * level,0,false);
 
-        if (results != null && results.typeOfHit == Type.BLOCK) {
-
-            final BlockPos tpPos = results.getBlockPos().offset(results.sideHit);
+        if (results instanceof BlockRayTraceResult) {
+            BlockRayTraceResult blockRayTraceResult = (BlockRayTraceResult)results;
+            final BlockPos tpPos = blockRayTraceResult.getPos().offset(blockRayTraceResult.getFace());
             user.setPositionAndUpdate(tpPos.getX() + 0.5, tpPos.getY(), tpPos.getZ() + 0.5f);
-            item.damageItem(50, user);
+            item.damageItem(50, user,livingEntity -> livingEntity.sendBreakAnimation(event.getHand()));
             user.attackEntityFrom(DamageSource.FALL, 1);
         }
     }
 
     private static void handleGreedEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
-        if (target.isNonBoss() && MathsUtils.tryPercentage(0.07 * level) && attacker instanceof PlayerEntity) {
+        if (target.isNonBoss() && Math.random() < 0.07 * level && attacker instanceof PlayerEntity) {
 
             final PlayerEntity player = (PlayerEntity) attacker;
-            int exp = EntityUtils.getExperiencePoints(target, player);
+            int exp = 0; //target.getExperiencePoints(attacker); //EntityUtils.getExperiencePoints(target, player);
+            try {
+                exp = (int) calculateXP.invoke(target,player);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
             exp = net.minecraftforge.event.ForgeEventFactory.getExperienceDrop(target, player, exp);
 
-            attacker.world.spawnEntity(new EntityXPOrb(target.world, target.posX, target.posY, target.posZ, exp));
+            attacker.world.addEntity(new ExperienceOrbEntity(target.world, target.getPosX(), target.getPosY(), target.getPosZ(), exp));
         }
     }
 
@@ -226,7 +245,7 @@ public class EnchantmentEffectHandler {
 
     private static void handleScornEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
-        if (target.dimension != 0) {
+        if (target.world.getDimensionKey() != World.OVERWORLD) {
 
             event.setAmount(event.getAmount() * (level + 1));
         }
@@ -234,17 +253,17 @@ public class EnchantmentEffectHandler {
 
     private static void handleAbsorbEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
-        if (attacker instanceof PlayerEntity && MathsUtils.tryPercentage(0.05 * level)) {
+        if (attacker instanceof PlayerEntity && Math.random() < 0.05 * level) {
 
             final PlayerEntity player = (PlayerEntity) attacker;
-            final int foodAmount = MathsUtils.nextIntInclusive(0, 2);
+            final int foodAmount = player.getRNG().nextInt(3);
             player.getFoodStats().addStats(foodAmount, foodAmount);
         }
     }
 
     private static void handleVenomousAspect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
-        target.addPotionEffect(new PotionEffect(MobEffects.POISON, 120 * level, level));
+        target.addPotionEffect(new EffectInstance(Effects.POISON, 120 * level, level));
     }
 
     private static void handleStealthEffect (LivingEntity user, ItemStack item, int level, RightClickItem event) {
@@ -254,25 +273,25 @@ public class EnchantmentEffectHandler {
 
     private static void handleVitalityEffect (LivingEntity attacker, ItemStack item, int level, RightClickItem event) {
 
-        item.damageItem(128, attacker);
-        attacker.addPotionEffect(new PotionEffect(MobEffects.ABSORPTION, 600, level - 1));
-        attacker.addPotionEffect(new PotionEffect(MobEffects.INSTANT_HEALTH, 10, level - 1));
-        attacker.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 500, level - 1));
+        item.damageItem(128, attacker,livingEntity -> livingEntity.sendBreakAnimation(event.getHand()));
+        attacker.addPotionEffect(new EffectInstance(Effects.ABSORPTION, 600, level - 1));
+        attacker.addPotionEffect(new EffectInstance(Effects.INSTANT_HEALTH, 10, level - 1));
+        attacker.addPotionEffect(new EffectInstance(Effects.REGENERATION, 500, level - 1));
     }
 
     private static void handleFeastEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
-        if (item.getItemDamage() > 0 && MathsUtils.tryPercentage(0.10 * level)) {
+        if (item.getDamage() > 0 && Math.random() < 0.10 * level) {
 
-            item.setItemDamage(Math.max(0, item.getItemDamage() - MathsUtils.nextIntInclusive(1 * level, 3 * level)));
+            item.setDamage(Math.max(0, item.getDamage() - attacker.getRNG().nextInt( 2 * level + 1) + level));
         }
     }
 
     private static void handleSparksEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
+        AxisAlignedBB bb = new AxisAlignedBB(target.getPosition().add(-level,-level,-level),target.getPosition().add(level,level,level));
+        for (final LivingEntity entity : target.world.getEntitiesWithinAABB(LivingEntity.class,bb)) {
 
-        for (final LivingEntity entity : EntityUtils.<LivingEntity> getEntitiesInArea(LivingEntity.class, target.getEntityWorld(), target.getPosition(), level)) {
-
-            if (entity != attacker && entity != target && !entity.isImmuneToFire() && !entity.isPotionActive(MobEffects.FIRE_RESISTANCE)) {
+            if (entity != attacker && entity != target && !entity.isImmuneToFire() && !entity.isPotionActive(Effects.FIRE_RESISTANCE)) {
 
                 entity.setFire(4 + level);
                 target.attackEntityFrom(DamageSource.ON_FIRE, level);
@@ -282,7 +301,7 @@ public class EnchantmentEffectHandler {
 
     private static void handleIgniteEffect (LivingEntity attacker, LivingEntity target, ItemStack item, int level, LivingHurtEvent event) {
 
-        if (!target.isImmuneToFire() && !target.isPotionActive(MobEffects.FIRE_RESISTANCE)) {
+        if (!target.isImmuneToFire() && !target.isPotionActive(Effects.FIRE_RESISTANCE)) {
 
             target.attackEntityFrom(DamageSource.ON_FIRE, level * 2f);
             target.setFire(1);

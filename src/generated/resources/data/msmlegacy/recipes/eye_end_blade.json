@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " po",
+    "dep",
+    "sd "
+  ],
+  "key": {
+    "p": {
+      "tag": "forge:ender_pearls"
+    },
+    "o": {
+      "tag": "forge:obsidian"
+    },
+    "d": {
+      "tag": "forge:gems/diamond"
+    },
+    "e": {
+      "item": "minecraft:ender_eye"
+    },
+    "s": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "result": {
+    "item": "msmlegacy:eye_end_blade"
+  }
+}

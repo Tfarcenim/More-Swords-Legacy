@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " lv",
+    "sfl",
+    "ts "
+  ],
+  "key": {
+    "l": {
+      "tag": "minecraft:leaves"
+    },
+    "v": {
+      "item": "minecraft:vine"
+    },
+    "s": {
+      "tag": "minecraft:saplings"
+    },
+    "f": {
+      "item": "minecraft:poppy"
+    },
+    "t": {
+      "tag": "forge:rods/wooden"
+    }
+  },
+  "result": {
+    "item": "msmlegacy:gladiolus"
+  }
+}
